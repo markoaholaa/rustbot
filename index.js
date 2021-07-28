@@ -5,6 +5,7 @@ const axios = require('axios');
 const { convert } = require('html-to-text');
 const config = require('./config');
 const prefix = config.prefix;
+const lang = require('./lang');
 
 client.on('ready', () => {
 	console.log('Bot is Ready!');
@@ -24,20 +25,20 @@ client.on('message', message => {
 				.then(response => {
 					const stats = response.data.playerstats.stats;
 					const embed = new MessageEmbed()
-						.setTitle(`Stats for ${steamid}`)
+						.setTitle(lang.stats_for + steamid)
 						.addFields(
 							{
-								name: 'Kills',
+								name: lang.kills,
 								value: stats[9].value,
 								inline: true
 							},
 							{
-								name: 'Deaths',
+								name: lang.deaths,
 								value: stats[0].value,
 								inline: true
 							},
 							{
-								name: 'Suicides',
+								name: lang.suicides,
 								value: stats[6].value,
 								inline: true
 							}
@@ -49,7 +50,7 @@ client.on('message', message => {
 				})
 				.catch(err => {
 					console.log(err);
-					message.channel.send('This user could not be found!');
+					message.channel.send(lang.err_noUser);
 				});
 		} else if (command === config.cmd_serverstats) {
 			config.servers.forEach(server => {
@@ -60,27 +61,27 @@ client.on('message', message => {
 							.setTitle(data.name)
 							.addFields(
 								{
-									name: 'Players',
+									name: lang.players,
 									value: data.players + ' / ' + data.maxPlayers,
 									inline: true
 								},
 								{
-									name: 'Queued Players',
+									name: lang.queued_players,
 									value: data.details.rust_queued_players,
 									inline: true
 								},
 								{
-									name: 'Rank',
+									name: lang.rank,
 									value: data.rank,
 									inline: true
 								},
 								{
-									name: 'Seed',
+									name: lang.seed,
 									value: data.details.rust_world_seed,
 									inline: true
 								},
 								{
-									name: 'Size',
+									name: lang.size,
 									value: data.details.rust_world_size,
 									inline: true
 								}
@@ -102,27 +103,27 @@ client.on('message', message => {
 						.setTitle(data.SteamId)
 						.addFields(
 							{
-								name: 'VAC Banned',
+								name: lang.vac_banned,
 								value: data.VACBanned,
 								inline: true
 							},
 							{
-								name: 'VAC Bans',
+								name: lang.vac_bans,
 								value: data.NumberOfVACBans,
 								inline: true
 							},
 							{
-								name: 'Gamebans',
+								name: lang.gamebans,
 								value: data.NumberOfGameBans,
 								inline: true
 							},
 							{
-								name: 'Since last ban',
+								name: lang.since_last_ban,
 								value: data.DaysSinceLastBan + ' days',
 								inline: true
 							},
 							{
-								name: 'Community Banned',
+								name: lang.community_banned,
 								value: data.CommunityBanned,
 								inline: true
 							}
@@ -133,7 +134,7 @@ client.on('message', message => {
 
 					message.channel.send(embed);
 				}).catch(err => {
-					message.channel.send('Please provide a Steam ID!');
+					message.channel.send(lang.err_noSteamId);
 				})
 		} else if (command === config.cmd_resolveid) {
 			const url = args[0].split('/');
@@ -143,7 +144,7 @@ client.on('message', message => {
 				.then(response => {
 					const data = response.data.response;
 					const embed = new MessageEmbed()
-						.setTitle(`Steam ID for ${id}`)
+						.setTitle(`Steam ID ${lang.for} ${id}`)
 						.setDescription(data.steamid)
 						.setColor(config.embed_color)
 						.setTimestamp()
@@ -152,24 +153,24 @@ client.on('message', message => {
 					message.channel.send(embed);
 				})
 				.catch(err => {
-					message.channel.send('Could not resolve Steam ID for given URL!');
+					message.channel.send(lang.err_cantResolve);
 				});
 		} else if (command === config.cmd_totalplayers) {
 			axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=252490')
 				.then(response => {
 					const data = response.data.response;
 					const embed = new MessageEmbed()
-						.setTitle(`Total players in Rust`)
+						.setTitle(lang.total_players)
 						.setDescription(data.player_count)
 						.setColor(config.embed_color)
 						.setTimestamp()
-						.setFooter('Current active players according to Steam')
+						.setFooter(lang.according_to_steam)
 						.setThumbnail(config.logo_url);
 
 					message.channel.send(embed);
 				})
 				.catch(err => {
-					message.channel.send('Could not retrieve the number of players!');
+					message.channel.send(lang.err_totalPlayers);
 				});
 		} else if (command === config.cmd_news) {
 			axios.get(`https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=252490&count=${config.rust_news_amount}`)
@@ -203,7 +204,7 @@ client.on('message', message => {
 					paginationEmbed(message, articles);
 				})
 				.catch(err => {
-					message.channel.send('Could not retrieve news! Try again!');
+					message.channel.send(lang.err_news);
 				});
 		} else if (command === config.cmd_blacklist) {
 			const ip = args[0];
@@ -214,9 +215,9 @@ client.on('message', message => {
 					const list = response.data.Servers.Banned;
 
 					if (list.includes(ip)) {
-						message.channel.send('This IP is blacklisted!');
+						message.channel.send(lang.is_blacklisted);
 					} else {
-						message.channel.send('This IP is not blacklisted!');
+						message.channel.send(lang.not_blacklisted);
 					}
 				});
 		} else if (command === config.cmd_help) {
@@ -224,7 +225,7 @@ client.on('message', message => {
 		}
 
 	} else {
-		message.channel.send('You dont have permissions to use these commands!');
+		message.channel.send(lang.err_permissions);
 	}
 });
 

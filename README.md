@@ -1,6 +1,7 @@
 # Rust Bot
+Fully translatable Rust Bot for Discord.
 
-### Features
+### Commands
 - [x] r/stats steamid - Shows users global Rust stats
 - [x] r/serverstats - Shows stats for servers in config.js
 - [x] r/bans steamid - Shows bans for given Steam ID
@@ -12,4 +13,3 @@
 ##  Support & Suggestions
 
 https://discord.gg/ehJjehppc3
-
