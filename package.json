@@ -14,7 +14,8 @@
     "discord.js-pagination": "^1.0.3",
     "html-to-text": "^8.0.0",
     "index.js": "^0.0.3",
-    "node": "^16.5.0"
+    "node": "^16.5.0",
+    "rustrcon": "^1.0.2"
   },
   "repository": {
     "type": "git",

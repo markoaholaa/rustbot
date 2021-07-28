@@ -7,21 +7,21 @@ module.exports = {
 	help_in_dm: true, // Send the help message in users DM = true, publicly = false
 
 	// Discord Bot Info
-	bot_token: 'ODY5ODE3ODYwNTgxNjUwNDQy.YQDvAg.iUmue2rMPsWvtIvKDinp6rPAwjA', // Enter your Discord bot token here
+	bot_token: '', // Enter your Discord bot token here
 	bot_status: 'WATCHING', // Available statuses: WATCHING, STREAMING, PLAYING, LISTENING, CUSTOM_STATUS, COMPETING
 	status_text: 'help', // Text shown after bot status
 
 	// Steam API
-	steam_apiKey: '202421567411E3481E99816B94F5E3C5', // Get Steam API key from https://steamcommunity.com/dev/apikey
+	steam_apiKey: '', // Get Steam API key from https://steamcommunity.com/dev/apikey
 
 	// RCON
 	rconPrefix: 'rc/', // Own prefix for security reasons
 	use_rcon: true,
-	rcon_ip: '54.37.245.61',
-	rcon_port: '28016',
-	rcon_pw: 'armadillo',
+	rcon_ip: '',
+	rcon_port: '',
+	rcon_pw: '',
 	use_chat_log: true, // Log server chat messages to channel
-	webhook: 'https://discord.com/api/webhooks/869921314025111562/xnB7Y-gSxybSo-ADDcj3StloEYc9QVA5bNC4_fmJGGBnU8DAePE81JiYniL000rMYbsO', // Webhook for the chat logs
+	webhook: '', // Webhook for the chat logs
 
 	// Rust Server IDs from Battlemetrics.com
 	// Get the ID from the Server URL -- https://www.battlemetrics.com/servers/rust/9255283 where the 9255283 is the ID
@@ -33,10 +33,10 @@ module.exports = {
 	// Permissions
 	everyone_can_use: true, // Set to true if you want everyone in your server to be able to use these commands.
 	allowed_users: [ // List all Discord IDs that can use the commands.
-		'529803538650497026', // Remember the comma ( , ) after each new line!
+		'', // Remember the comma ( , ) after each new line!
 	],
 	rcon_users: [ // These users are allowed to send RCON commands to server.
-		'529803538650497026',
+		'',
 	],
 
 	// Commands

@@ -1,16 +1,68 @@
-const { MessageEmbed, Client, Discord } = require('discord.js');
+const { MessageEmbed, Client } = require('discord.js');
+const Discord = require('discord.js');
 const client = new Client();
 const paginationEmbed = require('discord.js-pagination');
 const axios = require('axios');
 const { convert } = require('html-to-text');
 const config = require('./config');
 const prefix = config.prefix;
+const rconPrefix = config.rconPrefix;
+const { RconClient } = require('rustrcon');
 const lang = require('./lang');
 
 client.on('ready', () => {
 	console.log('Bot is Ready!');
 	client.user.setActivity(config.status_text, { type: config.bot_status });
 });
+
+let rcon;
+
+if (config.use_rcon === true) {
+	rcon = new RconClient({
+		ip: config.rcon_ip,
+		port: config.rcon_port,
+		password: config.rcon_pw
+	});
+
+	rcon.login();
+
+	rcon.on('connected', () => {
+		console.log(`RCON Connected to ${rcon.ws.ip}:${rcon.ws.port}`);
+	});
+
+	rcon.on('error', err => {
+		console.error(err);
+	});
+
+	rcon.on('disconnect', () => {
+		console.log('Disconnected from RCON websocket');
+	});
+}
+
+if (config.use_chat_log === true) {
+	const url = config.webhook.split('/');
+	const id = url[url.length - 2];
+	const token = url[url.length - 1];
+
+	const hook = new Discord.WebhookClient(id, token);
+
+	rcon.on('message', servermessage => {
+		console.log(servermessage);
+		if (servermessage.Type === 'Chat') {
+
+			const msg = servermessage.content.Message.split(':');
+			const sendMsg = msg.slice(1).join(' ');
+
+			const embed = new MessageEmbed()
+				.setTitle(servermessage.content.Username)
+				.setColor(config.embed_color)
+				.setDescription(sendMsg)
+				.setTimestamp();
+
+			hook.send(embed);
+		}
+	});
+}
 
 client.on('message', message => {
 	if (!message.content.startsWith(prefix) || message.author.bot) return;
@@ -233,10 +285,142 @@ client.on('message', message => {
 			} else {
 				message.channel.send(embed);
 			}
+		} else if (command === config.cmd_userinfo) {
+			const user = message.mentions.members.first();
+
+			console.log(user);
+
+			const joinDate = new Date(user.joinedTimestamp);
+			const year = joinDate.getFullYear();
+			const month = joinDate.getMonth() + 1;
+			const date = joinDate.getDate();
+			const joined = date + '/' + month + '/' + year;
+
+			const embed = new MessageEmbed()
+				.setTitle(lang.info_of + user.user.username + '#' + user.user.discriminator)
+				.addFields(
+					{
+						name: lang.info_joined,
+						value: joined
+					},
+					{
+						name: lang.info_userid,
+						value: user.user.id
+					}
+				)
+				.setThumbnail(`https://cdn.discordapp.com/avatars/${user.user.id}/${user.user.avatar}`);
+
+			message.channel.send(embed);
+		} else if (command === config.cmd_hours) {
+			const steamid = args[0];
+			axios.get(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${config.steam_apiKey}&steamid=${steamid}&format=json`)
+				.then(response => {
+					const hours = response.data.response.games;
+					const result = hours.filter(id => id.appid === 252490);
+					const h = Math.floor((result[0].playtime_forever / 60));
+
+					const embed = new MessageEmbed()
+						.setTitle(steamid)
+						.setDescription(`${lang.user_hours} ${h} ${lang.hours}`)
+						.setColor(config.embed_color)
+						.setTimestamp();
+
+					message.channel.send(embed);
+
+				})
+				.catch(err => {
+					message.channel.send(lang.err_general);
+				});
+		} else if (command === config.cmd_mapcheck) {
+			const seed = args[0];
+			const size = args[1];
+
+			axios.get(`https://rustmaps.com/api/v2/maps/${seed}/${size}?staging=false&barren=false`)
+				.then(response => {
+					const map = response.data;
+
+					console.log(map);
+
+					let launch;
+					let airfield;
+
+					if (map.monuments.some(monument => monument.monument === 'Launch_Site')) {
+						launch = 'True';
+					} else {
+						launch = 'False';
+					}
+
+					if (map.monuments.some(monument => monument.monument === 'Airfield')) {
+						airfield = 'True';
+					} else {
+						airfield = 'False';
+					}
+
+					const embed = new MessageEmbed()
+						.setTitle(map.seed + ' / ' + map.size)
+						.setImage(map.thumbnailUrl)
+						.setDescription(map.url)
+						.setColor(config.embed_color)
+						.setThumbnail(config.logo_url)
+						.addFields(
+							{
+								name: lang.monuments,
+								value: map.monuments.length
+							},
+							{
+								name: lang.launch_site,
+								value: launch,
+								inline: true
+							},
+							{
+								name: lang.airfield,
+								value: airfield,
+								inline: true
+							}
+						);
+
+					message.channel.send(embed);
+				})
+				.catch(err => {
+					message.channel.send('Map was not found!');
+				});
 		}
 
 	} else {
 		message.channel.send(lang.err_permissions);
+	}
+});
+
+client.on('message', message => {
+	if (config.rcon_users.some(user => user === message.author.id)) {
+		if (!message.content.startsWith(rconPrefix) || message.author.bot) return;
+
+		const args = message.content.slice(rconPrefix.length).trim().split(' ');
+		const command = args.shift().toLowerCase();
+
+		if (command === 'kick') {
+			const user = args[0];
+			const reason = args.slice(1).join(' ');
+			rcon.send(`kick ${user} ${reason}`);
+			message.channel.send(`Kicked user ${user}`);
+		} else if (command === 'ban') {
+			const user = args[0];
+			const reason = args.slice(1, args.length - 1).join(' ');
+			const length = args[args.length - 1];
+
+			rcon.send(`ban ${user} ${reason} ${length}`);
+			message.channel.send(`Banned user ${user}`);
+		} else if (command === 'kill') {
+			const user = args[0];
+			rcon.send(`kill ${user}`);
+			message.channel.send(`Killed user ${user}`);
+		} else if (command !== 'kick' || command !== 'ban' || command !== 'kill') {
+			rcon.send(`${command} ${args}`);
+			message.channel.send(`Sent ${command} ${args}`);
+		}
+	} else {
+		if (message.author.bot || message.webhookID) return;
+		message.channel.send(lang.rcon_err);
 	}
 });
 

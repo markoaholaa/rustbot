@@ -10,6 +10,14 @@ Fully translatable Rust Bot for Discord.
 - [x] r/rustnews - Fetches configurable amount of news articles containing Rust
 - [x] r/blacklist IP - Checks if the IP is blacklisted by Facepunch
 
-##  Support & Suggestions
+### Support & Suggestions
 
 https://discord.gg/ehJjehppc3
+
+### Updates
+- [x] r/hours steamid - Check how many hours a player has in Rust
+- [x] r/userinfo @user - Show info on Discord user
+
+### TODO
+- [ ] r/mapcheck seed size - Generate an image of given map
+- [ ] r/
