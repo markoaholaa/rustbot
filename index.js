@@ -221,7 +221,18 @@ client.on('message', message => {
 					}
 				});
 		} else if (command === config.cmd_help) {
+			const user = message.author;
 
+			const embed = new MessageEmbed()
+				.setTitle(lang.help_title)
+				.setDescription(lang.help_commands)
+				.setTimestamp();
+
+			if (config.help_in_dm === true) {
+				user.send(embed);
+			} else {
+				message.channel.send(embed);
+			}
 		}
 
 	} else {

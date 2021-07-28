@@ -1,9 +1,10 @@
 module.exports = {
 	// General
 	rust_news_amount: 3, // When doing the rustnews command, how many news articles should be fetched.
-	logo_url: 'https://i.imgur.com/BsQ370A.png',
+	logo_url: 'https://i.imgur.com/Zbbjn7r.png',
 	embed_color: '#03d7fc',
 	prefix: 'r/',
+	help_in_dm: true, // Send the help message in users DM = true, publicly = false
 
 	// Discord Bot Info
 	bot_token: '', // Enter your Discord bot token here
@@ -21,7 +22,7 @@ module.exports = {
 	],
 
 	// Permissions
-	everyone_can_use: false, // Set to true if you want everyone in your server to be able to use these commands.
+	everyone_can_use: true, // Set to true if you want everyone in your server to be able to use these commands.
 	allowed_users: [ // List all Discord IDs that can use the commands.
 		'', // Remember the comma ( , ) after each new line!
 	],

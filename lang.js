@@ -1,3 +1,4 @@
+const config = require('./config');
 module.exports = {
 	// Stats Command
 	stats_for: 'Stats for ',
@@ -35,4 +36,16 @@ module.exports = {
 	for: 'for',
 	total_players: 'Total players in Rust',
 	according_to_steam: 'Current active players according to Steam',
+
+	// Help Message
+	help_title: 'How to use Rust Bot',
+	help_commands: [
+		`${config.prefix}stats steamid - Display global Rust stats for given Steam ID.`,
+		`${config.prefix}serverstats - Display stats for Rust Bot servers.`,
+		`${config.prefix}bans steamid - Show bans for given Steam ID.`,
+		`${config.prefix}resolveid url - Resolve users Steam ID with their vanity URL.`,
+		`${config.prefix}totalplayers - Show total current players on Rust.`,
+		`${config.prefix}rustnews - Show news articles that contain Rust.`,
+		`${config.prefix}blacklist ip - Show if the server IP is blacklisted by Facepunch`,
+	]
 };
