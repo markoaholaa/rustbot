@@ -17,7 +17,6 @@ https://discord.gg/ehJjehppc3
 ### Updates
 - [x] r/hours steamid - Check how many hours a player has in Rust
 - [x] r/userinfo @user - Show info on Discord user
+- [x] r/mapcheck seed size - Show info of given map
+- [x] rc/ - Send RCON commands directly to your server
 
-### TODO
-- [ ] r/mapcheck seed size - Generate an image of given map
-- [ ] r/

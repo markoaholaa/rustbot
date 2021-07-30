@@ -1,13 +1,13 @@
-const { MessageEmbed, Client } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const Discord = require('discord.js');
-const client = new Client();
+const client = new Discord.Client();
 const paginationEmbed = require('discord.js-pagination');
 const axios = require('axios');
 const { convert } = require('html-to-text');
 const config = require('./config');
 const prefix = config.prefix;
 const rconPrefix = config.rconPrefix;
-const { RconClient } = require('rustrcon');
+const { Client } = require('./node_modules/rustrcon/src/index');
 const lang = require('./lang');
 
 client.on('ready', () => {
@@ -18,7 +18,7 @@ client.on('ready', () => {
 let rcon;
 
 if (config.use_rcon === true) {
-	rcon = new RconClient({
+	rcon = new Client({
 		ip: config.rcon_ip,
 		port: config.rcon_port,
 		password: config.rcon_pw
@@ -39,7 +39,7 @@ if (config.use_rcon === true) {
 	});
 }
 
-if (config.use_chat_log === true) {
+if (config.use_rcon && config.use_chat_log === true) {
 	const url = config.webhook.split('/');
 	const id = url[url.length - 2];
 	const token = url[url.length - 1];
@@ -339,8 +339,6 @@ client.on('message', message => {
 				.then(response => {
 					const map = response.data;
 
-					console.log(map);
-
 					let launch;
 					let airfield;
 
@@ -391,37 +389,57 @@ client.on('message', message => {
 	}
 });
 
-client.on('message', message => {
-	if (config.rcon_users.some(user => user === message.author.id)) {
-		if (!message.content.startsWith(rconPrefix) || message.author.bot) return;
+if (config.use_rcon === true) {
+	client.on('message', message => {
+		if (config.rcon_users.some(user => user === message.author.id)) {
+			if (!message.content.startsWith(rconPrefix) || message.author.bot) return;
 
-		const args = message.content.slice(rconPrefix.length).trim().split(' ');
-		const command = args.shift().toLowerCase();
+			const args = message.content.slice(rconPrefix.length).trim().split(' ');
+			const command = args.shift().toLowerCase();
 
-		if (command === 'kick') {
-			const user = args[0];
-			const reason = args.slice(1).join(' ');
-			rcon.send(`kick ${user} ${reason}`);
-			message.channel.send(`Kicked user ${user}`);
-		} else if (command === 'ban') {
-			const user = args[0];
-			const reason = args.slice(1, args.length - 1).join(' ');
-			const length = args[args.length - 1];
+			if (command === 'kick') {
+				const user = args[0];
+				const reason = args.slice(1).join(' ');
+				rcon.send(`kick ${user} ${reason}`);
+				rcon.on('message', servermsg => {
+					if (servermsg.content === 'Player not found') {
+						message.channel.send(`Player not found!`);
+					} else {
+						message.channel.send(`Kicked player ${user}`);
+					}
+				});
+			} else if (command === 'ban') {
+				const user = args[0];
+				const reason = args.slice(1, args.length - 1).join(' ');
+				const length = args[args.length - 1];
 
-			rcon.send(`ban ${user} ${reason} ${length}`);
-			message.channel.send(`Banned user ${user}`);
-		} else if (command === 'kill') {
-			const user = args[0];
-			rcon.send(`kill ${user}`);
-			message.channel.send(`Killed user ${user}`);
-		} else if (command !== 'kick' || command !== 'ban' || command !== 'kill') {
-			rcon.send(`${command} ${args}`);
-			message.channel.send(`Sent ${command} ${args}`);
+				rcon.send(`ban ${user} ${reason} ${length}`);
+				rcon.on('message', servermsg => {
+					if (servermsg.content === 'Player not found') {
+						message.channel.send(`Player not found!`);
+					} else {
+						message.channel.send(`Banned player ${user}`);
+					}
+				});
+			} else if (command === 'kill') {
+				const user = args[0];
+				rcon.send(`kill ${user}`);
+				rcon.on('message', servermsg => {
+					if (servermsg.content === 'Player not found') {
+						message.channel.send(`Player not found!`);
+					} else {
+						message.channel.send(`Killed player ${user}`);
+					}
+				});
+			} else if (command !== 'kick' || command !== 'ban' || command !== 'kill') {
+				rcon.send(`${command} ${args}`);
+				message.channel.send(`Sent ${command} ${args}`);
+			}
+		} else {
+			if (message.author.bot || message.webhookID) return;
+			message.channel.send(lang.rcon_err);
 		}
-	} else {
-		if (message.author.bot || message.webhookID) return;
-		message.channel.send(lang.rcon_err);
-	}
-});
+	});
+}
 
 client.login(config.bot_token);

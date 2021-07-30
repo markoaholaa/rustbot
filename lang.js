@@ -1,4 +1,4 @@
-const config = require('./config.sample');
+const config = require('./config');
 module.exports = {
 	// Stats Command
 	stats_for: 'Stats for ',

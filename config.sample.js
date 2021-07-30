@@ -1,4 +1,9 @@
 module.exports = {
+
+	/*
+	 * RENAME THIS FILE TO config.js
+	 */
+
 	// General
 	rust_news_amount: 3, // When doing the rustnews command, how many news articles should be fetched.
 	logo_url: 'https://i.imgur.com/Zbbjn7r.png',
