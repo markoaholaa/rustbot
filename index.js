@@ -234,7 +234,6 @@ client.on('message', message => {
 						let content = convert(article.contents, {
 							selectors: [
 								{ selector: 'img', format: 'skip' },
-								{ selector: 'previewyoutube', format: 'skip' }
 							]
 						});
 
@@ -380,7 +379,7 @@ client.on('message', message => {
 					message.channel.send(embed);
 				})
 				.catch(err => {
-					message.channel.send('Map was not found!');
+					message.channel.send(`${lang.err_map_not_found}`);
 				});
 		}
 
@@ -403,9 +402,9 @@ if (config.use_rcon === true) {
 				rcon.send(`kick ${user} ${reason}`);
 				rcon.on('message', servermsg => {
 					if (servermsg.content === 'Player not found') {
-						message.channel.send(`Player not found!`);
+						message.channel.send(`${lang.err_player_not_found}`);
 					} else {
-						message.channel.send(`Kicked player ${user}`);
+						message.channel.send(`${lang.kicked_player} ${user}`);
 					}
 				});
 			} else if (command === 'ban') {
@@ -416,7 +415,7 @@ if (config.use_rcon === true) {
 				rcon.send(`ban ${user} ${reason} ${length}`);
 				rcon.on('message', servermsg => {
 					if (servermsg.content === 'Player not found') {
-						message.channel.send(`Player not found!`);
+						message.channel.send(`${lang.err_player_not_found}`);
 					} else {
 						message.channel.send(`Banned player ${user}`);
 					}
@@ -426,9 +425,9 @@ if (config.use_rcon === true) {
 				rcon.send(`kill ${user}`);
 				rcon.on('message', servermsg => {
 					if (servermsg.content === 'Player not found') {
-						message.channel.send(`Player not found!`);
+						message.channel.send(`${lang.err_player_not_found}`);
 					} else {
-						message.channel.send(`Killed player ${user}`);
+						message.channel.send(`${lang.killed_player} ${user}`);
 					}
 				});
 			} else if (command !== 'kick' || command !== 'ban' || command !== 'kill') {

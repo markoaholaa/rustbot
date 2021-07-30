@@ -38,6 +38,12 @@ module.exports = {
 	err_permissions: 'You dont have permissions to use these commands!',
 	err_general: 'Something went wrong. Please try again later.',
 	rcon_err: 'You do not have permissions to send RCON commands!',
+	err_player_not_found: 'Player not found!',
+	err_map_not_found: 'Map was not found!',
+
+	// RCON Responses
+	killed_player: 'Killed player',
+	kicked_player: 'Kicked player',
 
 	// Misc
 	for: 'for',
